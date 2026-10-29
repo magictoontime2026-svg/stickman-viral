@@ -9,6 +9,7 @@ import { renderMedia, selectComposition } from "@remotion/renderer";
 import * as path from "path";
 import * as fs from "fs";
 import type { Episode } from "../src/scenes/types";
+import { ensureBackgroundMusic } from "./background-music";
 
 export async function renderEpisode(
   episode: Episode,
@@ -28,6 +29,7 @@ export async function renderEpisode(
 
   // Bundle the Remotion project
   console.log("📦 Bundling project...");
+  ensureBackgroundMusic();
   const bundled = await bundle({
     entryPoint: path.resolve("src/index.ts"),
     webpackOverride: (config) => config,

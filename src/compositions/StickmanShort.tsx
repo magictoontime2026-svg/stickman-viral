@@ -8,7 +8,9 @@
 import React, { useMemo } from "react";
 import {
   AbsoluteFill,
+  Audio,
   Sequence,
+  staticFile,
   useVideoConfig,
 } from "remotion";
 import { Stickman } from "../components/Stickman";
@@ -210,6 +212,7 @@ export const StickmanShort: React.FC<StickmanShortProps> = ({ episode }) => {
 
   return (
     <AbsoluteFill style={{ backgroundColor: "#000" }}>
+      <Audio src={staticFile("generated-background-music.wav")} volume={0.3} />
       {episode.beats.map((beat, i) => (
         <Sequence
           key={i}

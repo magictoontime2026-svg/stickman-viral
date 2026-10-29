@@ -3,3 +3,4 @@ node_modules/
 dist/
 output/
 *.mp4
+public/generated-background-music.wav

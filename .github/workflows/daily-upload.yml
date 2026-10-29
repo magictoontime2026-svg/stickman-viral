@@ -1,14 +1,14 @@
 # Stickman Viral Factory — Daily YouTube Shorts Automation
 #
-# Runs every day at 10:00 AM UTC, generates a new stickman comedy short,
+# Runs every day at 9:00 AM and 5:00 PM IST, generates new stickman comedy shorts,
 # renders it, and uploads to YouTube automatically.
 
 name: "🎬 Daily Stickman Short"
 
 on:
   schedule:
-    # Every day at 10:00 AM UTC (adjust to your timezone)
-    - cron: "0 10 * * *"
+    # 9:00 AM and 5:00 PM Indian Standard Time (UTC+5:30)
+    - cron: "30 3,11 * * *"
 
   # Manual trigger for testing
   workflow_dispatch:

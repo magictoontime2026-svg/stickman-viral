@@ -67,7 +67,6 @@ export async function uploadToYouTube(
     episode.hashtags.join(" "),
     "",
     "---",
-    "🤖 Auto-generated stickman comedy",
     "📺 New episode every day!",
     "👆 Subscribe for more!",
     "",
