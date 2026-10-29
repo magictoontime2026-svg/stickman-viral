@@ -1,0 +1,78 @@
+# Stickman Viral Factory — Daily YouTube Shorts Automation
+#
+# Runs every day at 10:00 AM UTC, generates a new stickman comedy short,
+# renders it, and uploads to YouTube automatically.
+
+name: "🎬 Daily Stickman Short"
+
+on:
+  schedule:
+    # Every day at 10:00 AM UTC (adjust to your timezone)
+    - cron: "0 10 * * *"
+
+  # Manual trigger for testing
+  workflow_dispatch:
+    inputs:
+      theme:
+        description: "Custom theme (optional)"
+        required: false
+        type: string
+
+jobs:
+  daily-short:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🎬 Run daily pipeline
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+        run: |
+          if [ -n "${{ github.event.inputs.theme }}" ]; then
+            npx tsx scripts/generate-episode.ts "${{ github.event.inputs.theme }}"
+          else
+            npx tsx scripts/generate-episode.ts
+          fi
+          npx tsx scripts/render.ts
+          npx tsx scripts/upload.ts
+
+      - name: 📊 Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: "episode-${{ github.run_number }}"
+          path: |
+            output/latest-episode.json
+            output/latest.mp4
+            output/pipeline-log.jsonl
+            output/upload-log.jsonl
+          retention-days: 30
+
+      - name: 📝 Summary
+        if: always()
+        run: |
+          echo "## 🎬 Daily Stickman Short" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f output/latest-episode.json ]; then
+            TITLE=$(cat output/latest-episode.json | python3 -c "import sys,json; print(json.load(sys.stdin)['title'])")
+            echo "**Title:** ${TITLE}" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ -f output/upload-log.jsonl ]; then
+            URL=$(tail -1 output/upload-log.jsonl | python3 -c "import sys,json; print(json.load(sys.stdin)['url'])")
+            echo "**YouTube:** ${URL}" >> $GITHUB_STEP_SUMMARY
+          fi
